@@ -1,0 +1,7 @@
+export async function main(ns) {
+    var server_list = "server_list.txt";
+    if (!ns.fileExists(server_list)) {
+        ns.run("build_server_list.ns", 1, server_list);
+    }
+    ns.run("deploy_server_watchers.ns", 1, server_list);
+}
