@@ -11,8 +11,8 @@ export async function main(ns) {
             // If the server's security level is above our threshold, weaken it
             await ns.weaken(target);
         } else {
-            //count = count + 1;
-            //count = count % radix;
+            count = count + 1;
+            count = count % radix;
             if (count === 0) {
                 // hack every time the count rolls over
                 await ns.hack(target);
