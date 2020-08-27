@@ -1,12 +1,17 @@
 export async function main(ns) {
     var server_list_filename = ns.args[0];
+    var server_blacklist_filename = "server_blacklist.txt";
     while (!ns.fileExists(server_list_filename)) {
         ns.sleep(10 * 1000);
     }
     ns.sleep(10 * 1000);
     var server_list = ns.read(server_list_filename).split("\n");
+    var server_blacklist = ns.read(server_blacklist_filename).split("\n");
     // ns.tprint(server_list);
     server_list.forEach(function(server) {
-        ns.run("server_watcher.ns" , 1, server);
-    }) 
+        if (!(server_blacklist.includes(server)) &&
+            !(server === "home")) {
+            ns.run("server_watcher.ns" , 1, server);
+        }
+    });
 }
