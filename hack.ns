@@ -1,0 +1,28 @@
+export async function main(ns) {
+    let target = ns.args[0];
+
+    let moneyThresh = ns.getServerMaxMoney(target) * 0.75;
+    let securityThresh = ns.getServerMinSecurityLevel(target) + 5;
+
+    let count = -1;
+    let radix = 10;
+    while (true) {
+        if (ns.getServerSecurityLevel(target) > securityThresh) {
+            // If the server's security level is above our threshold, weaken it
+            await ns.weaken(target);
+        } else {
+            //count = count + 1;
+            //count = count % radix;
+            if (count === 0) {
+                // hack every time the count rolls over
+                await ns.hack(target);
+            } else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
+                // If the server's money is less than our threshold, grow it
+                await ns.grow(target);
+            } else {
+                // Otherwise, hack it
+                await ns.hack(target);
+            }
+        }
+    }
+}
