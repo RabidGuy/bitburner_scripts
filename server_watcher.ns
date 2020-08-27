@@ -1,0 +1,28 @@
+export async function main(ns) {
+    let server = ns.args[0];
+    let port_count = ns.getServerNumPortsRequired(server);
+    let port_script_count = 0;
+    while (true) {
+        if (ns.fileExists("BruteSSH.exe", "home")) port_script_count++;
+        if (ns.fileExists("FTPCrack.exe", "home")) port_script_count++;
+        if (ns.fileExists("relaySMTP.exe", "home")) port_script_count++;
+        if (ns.fileExists("HTTPWorm.exe", "home")) port_script_count++;
+        if (ns.fileExists("SQLInject.exe", "home")) port_script_count++;
+        if (port_script_count >= port_count) {
+            break;
+        }
+        await ns.sleep(10 * 60 * 1000);
+        port_script_count = 0;
+    }
+    if (ns.fileExists("BruteSSH.exe", "home")) ns.brutessh(server);
+    if (ns.fileExists("FTPCrack.exe", "home")) ns.ftpcrack(server);
+    if (ns.fileExists("relaySMTP.exe", "home")) ns.relaysmtp(server);
+    if (ns.fileExists("HTTPWorm.exe", "home")) ns.httpworm(server);
+    if (ns.fileExists("SQLInject.exe", "home")) ns.sqlinject(server);
+    ns.nuke(server);
+    let required_hacking_level = ns.getServerRequiredHackingLevel(server);
+    while (ns.getHackingLevel() < required_hacking_level) {
+        await ns.sleep(10 * 60 * 1000);
+    }
+    ns.spawn("hack.ns", 1, server);
+}
