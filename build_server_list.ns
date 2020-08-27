@@ -1,0 +1,27 @@
+export function main(ns) {
+    // let out_filename = "server_list.txt";
+    let out_filename = ns.args[0];
+    let server_list = scanForAllServers(ns);
+    // create file or clean existing
+    ns.write(out_filename, "", "w");
+    for (let i=0; i<server_list.length; i++) {
+        let server = server_list[i];
+        ns.write(out_filename, server + "\n", "a");
+    }
+}
+
+
+function scanForAllServers(ns) {
+    let server_list = ns.scan("home");
+    for (let i=0; i<server_list.length; i++) {
+        let server = server_list[i];
+        let neighbors = ns.scan(server);
+        for (let j=0; j<neighbors.length; j++) {
+            let n = neighbors[j];
+            if (!(server_list.includes(n)) && n !== "home") {
+                server_list.push(n);
+            }
+        }
+    }
+    return server_list;
+}
