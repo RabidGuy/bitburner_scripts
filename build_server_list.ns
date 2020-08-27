@@ -1,12 +1,12 @@
 export function main(ns) {
-    // let out_filename = "server_list.txt";
     let out_filename = ns.args[0];
     let server_list = scanForAllServers(ns);
-    // create file or clean existing
     ns.write(out_filename, "", "w");
-    for (let i=0; i<server_list.length; i++) {
-        let server = server_list[i];
-        ns.write(out_filename, server + "\n", "a");
+    let server = server_list[0];
+    ns.write(out_filename, server, "a");
+    for (let i=1; i<server_list.length; i++) {
+        server = server_list[i];
+        ns.write(out_filename, "\n" + server, "a");
     }
 }
 
