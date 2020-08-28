@@ -1,5 +1,11 @@
 export async function main(ns) {
     let server = ns.args[0];
+    if (ns.getServerMoneyAvailable(server) > 0) {
+        await watch(ns, server);        
+    }
+}
+
+async function watch(ns, server) {
     let port_count = ns.getServerNumPortsRequired(server);
     let port_script_count = 0;
     while (true) {
@@ -24,5 +30,5 @@ export async function main(ns) {
     while (ns.getHackingLevel() < required_hacking_level) {
         await ns.sleep(10 * 60 * 1000);
     }
-    ns.spawn("hack.ns", 1, server);
+    ns.spawn("hack.ns", 2, server);    
 }
