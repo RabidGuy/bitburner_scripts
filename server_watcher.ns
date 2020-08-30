@@ -8,6 +8,7 @@ export async function main(ns) {
 async function watch(ns, server) {
     let port_count = ns.getServerNumPortsRequired(server);
     let port_script_count = 0;
+    let wait_counter = 1;
     while (true) {
         if (ns.fileExists("BruteSSH.exe", "home")) port_script_count++;
         if (ns.fileExists("FTPCrack.exe", "home")) port_script_count++;
@@ -17,8 +18,9 @@ async function watch(ns, server) {
         if (port_script_count >= port_count) {
             break;
         }
-        await ns.sleep(10 * 60 * 1000);
+        await ns.sleep(wait_counter * 60 * 1000);
         port_script_count = 0;
+        wait_counter *= 1.1;
     }
     if (ns.fileExists("BruteSSH.exe", "home")) ns.brutessh(server);
     if (ns.fileExists("FTPCrack.exe", "home")) ns.ftpcrack(server);
@@ -28,7 +30,8 @@ async function watch(ns, server) {
     ns.nuke(server);
     let required_hacking_level = ns.getServerRequiredHackingLevel(server);
     while (ns.getHackingLevel() < required_hacking_level) {
-        await ns.sleep(10 * 60 * 1000);
+        await ns.sleep(wait_counter * 60 * 1000);
+        wait_counter *= 1.1;
     }
-    ns.spawn("hack.ns", 2, server);    
+    ns.spawn("hack.ns", 1, server);    
 }
