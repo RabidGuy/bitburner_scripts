@@ -1,13 +1,17 @@
 export async function main(ns) {
     let target = ns.args[0];
 
-    let moneyThresh = ns.getServerMaxMoney(target) * 0.75;
-    let securityThresh = ns.getServerMinSecurityLevel(target) + 5;
+    let min = 0;
+    let max = ns.getServerMaxMoney(target) * 0.95;
+    let last = 0;
+    let current = 0;
+    let securityThreshold = ns.getServerMinSecurityLevel(target) * 1.1;
 
+    // This while loop will get us our first hack.
     let count = -1;
     let radix = 10;
-    while (true) {
-        if (ns.getServerSecurityLevel(target) > securityThresh) {
+    while (last === 0) {
+        if (ns.getServerSecurityLevel(target) > securityThreshold) {
             // If the server's security level is above our threshold, weaken it
             await ns.weaken(target);
         } else {
@@ -15,14 +19,42 @@ export async function main(ns) {
             count = count % radix;
             if (count === 0) {
                 // hack every time the count rolls over
-                await ns.hack(target);
-            } else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
+                last = await ns.hack(target);
+            } else if (ns.getServerMoneyAvailable(target) < max) {
                 // If the server's money is less than our threshold, grow it
                 await ns.grow(target);
             } else {
                 // Otherwise, hack it
-                await ns.hack(target);
+                last = await ns.hack(target);
             }
         }
     }
+    
+    current = ns.getServerMoneyAvailable(target);
+    min = updateMin(current, last);
+    last = 0;
+    
+    while (true) {
+        if (ns.getServerSecurityLevel(target) > securityThreshold) {
+            // If the server's security level is above our threshold, weaken it
+            await ns.weaken(target);
+        } else {
+            if (current > max) {
+                last = await ns.hack(target);
+            } else if (current < min) {
+                await ns.grow(target);
+            } else {
+                last = await ns.hack(target);
+            }
+            current = ns.getServerMoneyAvailable(target);
+            if (last > 0) {
+                min = updateMin(current, last);
+                last = 0;
+            }
+        }
+    }
+}
+
+function updateMin(current, last) {
+    return current + 3 * last;
 }
